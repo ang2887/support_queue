@@ -39,3 +39,4 @@ CREATE TABLE matches (
     staff_id INTEGER REFERENCES support_staff(staff_id),
     matched_at TIMESTAMP NOT NULL
 );
+

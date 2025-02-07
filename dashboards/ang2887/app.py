@@ -170,3 +170,5 @@ def update_dashboard(company_size_category, date_range, avg_plot_relayout, total
         
 if __name__ == '__main__':    
     app.run_server(host='localhost', debug=True)
+
+    
