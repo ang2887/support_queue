@@ -1,3 +1,5 @@
+-- create_tables.sql
+
 -- // copy past into supabase sql editor
 
 CREATE TABLE companies (
