@@ -1,4 +1,4 @@
-# neon_data_processing.py
+# neon_data_processing.py 1
 
 import os
 import pandas as pd
@@ -10,10 +10,10 @@ load_dotenv()
 USE_NEON = os.getenv("USE_NEON", "0") == "1"
 db_url = os.getenv("NEON_DB_URL") if USE_NEON else os.getenv("SUPABASE_DB_URL")
 
-print(f"🔄 Connecting to {'Neon' if USE_NEON else 'Supabase'} database...")
+print(f" Connecting to {'Neon' if USE_NEON else 'Supabase'} database...")
 
-
-
+def load_and_process():
+    try:
         engine = create_engine(db_url)
 
         # Querying using SQLAlchemy text() method
@@ -31,8 +31,8 @@ print(f"🔄 Connecting to {'Neon' if USE_NEON else 'Supabase'} database...")
             df_status = pd.read_sql(query_status, con=connection)
             df_support_staff = pd.read_sql(query_support_staff, con=connection)
 
-        # Now that the dataframes are loaded, process them as usual
-        # Datetime columns to the correct format
+        # Now that the dataframes are loaded, processing them as usual
+        # Converting date columns to datetime format
         df_tickets['created_at'] = pd.to_datetime(df_tickets['created_at'])
         df_matches['matched_at'] = pd.to_datetime(df_matches['matched_at'])
         df_status['timestamp'] = pd.to_datetime(df_status['timestamp'])
@@ -42,7 +42,7 @@ print(f"🔄 Connecting to {'Neon' if USE_NEON else 'Supabase'} database...")
         ticket_match['wait_time'] = ticket_match['matched_at'] - ticket_match['created_at']
         ticket_match_companies = pd.merge(ticket_match, df_companies, on="company_id", how="left")
         ticket_match_companies_status = pd.merge(ticket_match_companies, df_status, on='ticket_id', how='left')
-        
+
         ticket_match_companies_status['wait_time_minutes'] = ticket_match_companies_status['wait_time'].dt.total_seconds() / 60
         ticket_match_companies_status['solve_time'] = ticket_match_companies_status['timestamp'] - ticket_match_companies_status['matched_at']
         ticket_match_companies_status['solve_time_minutes'] = ticket_match_companies_status['solve_time'].dt.total_seconds() / 60
@@ -75,12 +75,12 @@ print(f"🔄 Connecting to {'Neon' if USE_NEON else 'Supabase'} database...")
         dftm.set_index('created_at', inplace=True)
 
         dft_dash = df.copy(deep=True)
-
+        
         return df, dftm, dft_dash
 
-    except Exception as e:
+    except Exception as e:  
         print(f"Error connecting to the database or executing query: {e}")
-        return None
+        return None, None, None
 
 # Running the function if the script is executed
 if __name__ == '__main__':
